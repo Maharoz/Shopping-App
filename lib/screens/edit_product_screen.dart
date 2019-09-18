@@ -1,20 +1,40 @@
 import 'package:flutter/material.dart';
 
 class EditProductScreen extends StatefulWidget {
-  static const routeName='./edit-product';
+  static const routeName = './edit-product';
   @override
   _EditProductScreen createState() => _EditProductScreen();
 }
 
 class _EditProductScreen extends State<EditProductScreen> {
-final _priceFocusNode = FocusNode();
-final _descriptionFocusNode =FocusNode();
+  final _priceFocusNode = FocusNode();
+  final _descriptionFocusNode = FocusNode();
+  final _imageUrlController = TextEditingController();
+  final _imageUrlFocusNode = FocusNode();
 
-  @override
-  void dispose(){
+@override
+void initState(){
+  _imageUrlFocusNode.addListener(_updateImageUrl);
+  super.initState();
+}
+
+
+ @override
+  void dispose() {
+    _imageUrlFocusNode.removeListener(_updateImageUrl);
     _priceFocusNode.dispose();
     _descriptionFocusNode.dispose();
+    _imageUrlController.dispose();
+    _imageUrlFocusNode.dispose();
     super.dispose();
+  }
+
+  void _updateImageUrl(){
+    if(!_imageUrlFocusNode.hasFocus){
+      setState(() {
+        
+      });
+    }
   }
 
   Widget build(BuildContext context) {
@@ -28,28 +48,61 @@ final _descriptionFocusNode =FocusNode();
             child: ListView(
           children: <Widget>[
             TextFormField(
-              decoration: InputDecoration(labelText: 'Title',),
+              decoration: InputDecoration(
+                labelText: 'Title',
+              ),
               textInputAction: TextInputAction.next,
-              onFieldSubmitted: (_){
+              onFieldSubmitted: (_) {
                 FocusScope.of(context).requestFocus(_priceFocusNode);
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Price',),
+              decoration: InputDecoration(
+                labelText: 'Price',
+              ),
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.number,
               focusNode: _priceFocusNode,
-              onFieldSubmitted: (_){
+              onFieldSubmitted: (_) {
                 FocusScope.of(context).requestFocus(_descriptionFocusNode);
               },
             ),
-             TextFormField(
-              decoration: InputDecoration(labelText: 'Description',),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Description',
+              ),
               maxLines: 3,
               keyboardType: TextInputType.multiline,
               focusNode: _descriptionFocusNode,
-             
             ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  width: 100,
+                  height: 100,
+                  margin: EdgeInsets.only(top: 8, right: 10),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: _imageUrlController.text.isEmpty
+                      ? Text('Enter a URL')
+                      : FittedBox(
+                          child: Image.network(
+                            _imageUrlController.text,
+                            fit:BoxFit.cover)),
+                ),
+                Expanded(
+                  child: TextFormField(
+                    decoration: InputDecoration(labelText: 'Image URL'),
+                    keyboardType: TextInputType.url,
+                    textInputAction: TextInputAction.done,
+                    controller: _imageUrlController,
+                    focusNode: _imageUrlFocusNode,
+                  ),
+                )
+              ],
+            )
           ],
         )),
       ),
